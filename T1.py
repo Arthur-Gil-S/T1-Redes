@@ -1,3 +1,6 @@
+from cmath import sin
+from unittest import result
+
 
 class Codifica:
 
@@ -13,8 +16,6 @@ class Codifica:
         # e valida apenas a partir do primeiro bit 1, fazendo com que o numero binario não esteja completo
         while len(binario) % 4 != 0:
             binario = '0' + binario
-        print(binario)
-
         return binario
 
     def nrzi(self): # se receber bit 1 inverte o sinal, se receber 0 copia o sinal anterior
@@ -37,7 +38,27 @@ class Codifica:
                     else : result += '-'
     
         print(result)
-    
+
+    def mdif(self):
+        binario = Codifica.hexToBin(cod)
+        result = ''
+        for bit in binario:
+            if len(result) == 0:
+                if bit == '0':
+                    result += '+-'
+                else: result += '-+'
+            else:
+                if bit == '0':
+                    size = len(result)
+                    result += result[size-2] + result[size-1]
+                else:
+                    size = len(result)
+                    if result[size-1] == '-':
+                        result += '-+'
+                    else: result += '+-'
+        print(result)
+
+
 
 class Decodifica:
 
@@ -47,6 +68,8 @@ class Decodifica:
     def hexToBin(self, tec): # recebe o binário através da decodificação da técnica e retorna um hexa
         if tec == 'nrzi':
             binario = Decodifica.nrzi(sinal)
+        if tec == 'mdif':
+            binario = Decodifica.mdif(sinal)
         hexa = (hex(int(binario, 2))).split('x')[1]
         print(hexa)
 
@@ -73,8 +96,25 @@ class Decodifica:
             index = index + 1
         return result
 
-
-
+    def mdif(self):
+        if len(sinal) % 2 == 1:
+            print('ERRO')
+        result = ''
+        size = len(sinal)
+        i = 0
+        for i in range(size):
+            if i == 0:
+                if sinal[i] == '+':
+                    result += '0'
+                else:
+                    result += '1'
+            elif i % 2 == 0:
+                last = sinal[i-2] + sinal[i-1]
+                current = sinal[i] + sinal[i+1]
+                if last == current:
+                    result += '0'
+                else: result += '1'
+        return result
 
 comando = input() # codificador nrzi 1234
 comando = comando.split(' ')
@@ -85,11 +125,8 @@ if func == 'codificador':
     inst_cod = Codifica(cod) # cria objeto/instancia de Codificação
     if tec == 'nrzi':
         inst_cod.nrzi()
+    if tec == 'mdif':
+        inst_cod.mdif()
 else:
     inst_dec = Decodifica(sinal)
-    if tec == 'nrzi':
-        inst_dec.hexToBin(tec)
-        
-
-
-
+    inst_dec.hexToBin(tec)
