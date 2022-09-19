@@ -37,6 +37,14 @@ class Codifica:
                 list.append(num)
                 num = ''
         return list
+    
+    def countDisparity(binario):
+        disparity = 0
+        for b in binario:
+            if b == '0':
+                disparity -= 1
+            else: disparity += 1
+        return disparity
 
     def findCode(binario):
         file = open("6b8b.txt","r")
