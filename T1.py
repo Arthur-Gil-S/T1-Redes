@@ -115,6 +115,62 @@ class Codifica:
         new_result = ''.join(result)
         print(new_result)
 
+    def countViolation(binario):
+        lastBit = '-'
+        count = 0
+        i = 0
+        result = ''
+        for i in range(len(binario)):
+            if binario[i] == '0':
+                count+=1
+                if count == 4:
+                    if lastBit == '-':
+                        result += '+'
+                    else: result += '-'
+                else: result += '0'
+            else: 
+                result += '1'
+                count = 0
+        return result
+
+    def hdb3(self):
+        binario = Codifica.hexToBin(cod)
+        violation = Codifica.countViolation(binario)
+
+        lastSignal = '-'
+        i = 0
+        result = ''
+        for i in range(len(violation)):
+            if i == 0 and violation[0] == '1':
+                result += '+'
+                lastSignal = '+'
+            elif violation[i] == '1':
+                if lastSignal == '+':
+                    result += '-'
+                    lastSignal = '-'
+                else: 
+                    result += '+'
+                    lastSignal = '+'
+            elif violation[i] == '0':
+                if i < len(violation)-3:
+                    if violation[i+3] == '+' and lastSignal == '-':
+                        result += '+'
+                        lastSignal = '+'
+                    elif violation[i+3] == '-' and lastSignal == '+':
+                        result += '-'
+                        lastSignal = '-'
+                    else:
+                        result += '0'
+                else:
+                    result += '0'
+            elif violation[i] == '+':
+                result += '+'
+                lastSignal = '+'
+            elif violation[i] == '-':
+                result += '-'
+                lastSignal = '-'   
+        print(result)
+
 
 class Decodifica:
 
@@ -128,6 +184,8 @@ class Decodifica:
             binario = Decodifica.mdif(sinal)
         if tec == '8b6t':
             binario = Decodifica.eightBsixT(sinal)
+        if tec == 'hdb3':
+            binario = Decodifica.hdb3(sinal)
         if binario.startswith('0000'):
             hexa = '0' + str((hex(int(binario, 2))).split('x')[1])
         else:
@@ -226,6 +284,31 @@ class Decodifica:
         binario_result = binario_result.join(list_binarios)
 
         return binario_result
+
+    def hdb3(self):
+        result = ''
+        i = 0
+        for i in range(len(sinal)):
+            if sinal[i] == '0':
+                result += '0'
+            else:
+                if i < len(sinal)-4 and sinal[i+4] == sinal[i+1] and sinal[i+2] == '0' and sinal[i+3] == '0' and sinal[i] != sinal[i+4] and sinal[i] != '0':
+                    result += '1'
+                elif i < len(sinal)-4 and sinal[i+4] == sinal[i] and sinal[i+1] == '0' and sinal[i+2] == '0' and sinal[i+3] == '0':
+                    result += '1'
+                elif i < len(sinal)-3 and sinal[i+3] == sinal[i] and sinal[i+1] == '0' and sinal[i+2] == '0':
+                    result += '0'
+                elif len(result) > 3 and sinal[i-4] == sinal[i] and sinal[i-1] == '0' and sinal[i-2] == '0' and sinal[i-3] == '0':
+                    result += '0'
+                elif len(result) > 2 and sinal[i-3] == sinal[i] and sinal[i-1] == '0' and sinal[i-2] == '0':
+                    result += '0'
+                elif len(result) > 3 and sinal[i-3] == sinal[i] and sinal[i-1] == '0' and sinal[i-2] == '0' and sinal[i] != sinal[i-4] and sinal[i-4] != '0':
+                    result += '0'
+                else:
+                    result += '1'
+                
+        print(result)
+        return result
 
 comando = input() # codificador nrzi 1234
 comando = comando.split(' ')
