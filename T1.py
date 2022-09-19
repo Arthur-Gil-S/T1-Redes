@@ -18,9 +18,64 @@ class Codifica:
             binario = '0' + binario
         return binario
 
-    def nrzi(self): # se receber bit 1 inverte o sinal, se receber 0 copia o sinal anterior
+    def hexToBin6B8B(self): # converte de hexa para binário
 
-        binario = Codifica.hexToBin(cod)
+        #binario = bin(int(cod, 16))[2:]
+        binario = bin(int('1'+cod, 16))[3:]
+
+        # formata o número binário para ser múltiplo de 4
+        # motivo: na conversão hex to bin do Python ele desconsidera os bits 0 iniciais,
+        # e valida apenas a partir do primeiro bit 1, fazendo com que o numero binario não esteja completo
+        while len(binario) % 6 != 0:
+            binario = '0' + binario
+        i = 0
+        list = []
+        num = ''
+        for i in range(len(binario)):
+            num += binario[i]
+            if len(num) == 6:
+                list.append(num)
+                num = ''
+        return list
+
+    def findCode(binario):
+        file = open("6b8b.txt","r")
+
+        for line in file:
+            code = line.split()
+            if code[0] == binario:
+                return code[1]
+        file.close()
+
+    def encode6b8b(self):
+  
+        listNum = Codifica.hexToBin6B8B(cod)
+        result = ''
+        for num in listNum:
+            disparity = Codifica.countDisparity(num)
+            if disparity == 0:
+                result += '10' + num
+            elif disparity == 2 and num != '001111':
+                result += '00' + num
+            elif disparity == -2 and num != '110000':
+                result += '11' + num
+            elif disparity == -6:
+                result += '01011001'
+            elif disparity == 6:
+                result += '01100110'
+            elif num == '001111':
+                result += '01001011'
+            elif num == '110000':
+                result += '01110100'
+            elif disparity == 4 or disparity == -4:
+                result += Codifica.findCode(num)
+        return result
+
+    def nrzi(self, tec): # se receber bit 1 inverte o sinal, se receber 0 copia o sinal anterior
+        if tec == 'nrzi':
+            binario = Codifica.hexToBin(cod)
+        else:
+            binario = Codifica.encode6b8b(cod)
 
         result = ''
         for bit in binario:
@@ -186,6 +241,8 @@ class Decodifica:
             binario = Decodifica.eightBsixT(sinal)
         if tec == 'hdb3':
             binario = Decodifica.hdb3(sinal)
+        if tec == '6b8b':
+            binario = Decodifica.sixBeightB(sinal)
         if binario.startswith('0000'):
             hexa = '0' + str((hex(int(binario, 2))).split('x')[1])
         else:
@@ -307,7 +364,39 @@ class Decodifica:
                 else:
                     result += '1'
                 
-        print(result)
+        #print(result)
+        return result
+
+    def sixBeightB(self):
+        global sinal
+        binario = Decodifica.nrzi(sinal)
+
+        binaries = []
+        cont = 0
+        space = ''
+        for b in binario:
+            cont = cont + 1
+            if cont % 8 == 0:
+                space += b + ' '
+            else:
+                space += b
+        binaries = space.split()
+
+        tabel = {}
+        with open('6b8b.csv') as file:
+            csv_table = csv.reader(file, delimiter=',')
+            for row in csv_table:
+                tabel.update({row[0]:row[1]})
+
+        results = []
+        for bin in binaries:
+            prefix = bin[0] + bin[1]
+            if prefix == '01':
+                results.append(tabel.get(bin))
+            else:
+                results.append(bin[2:])
+            
+        result = ''.join(results)
         return result
 
 comando = input() # codificador nrzi 1234
@@ -323,6 +412,10 @@ if func == 'codificador':
         inst_cod.mdif()
     if tec == '8b6t':
         inst_cod.eightBsixT()
+    if tec == 'hdb3':
+        inst_cod.hdb3()
+    if tec == '6b8b':
+        inst_cod.nrzi('6b8b')
 else:
     inst_dec = Decodifica(sinal)
     inst_dec.hexToBin(tec)
