@@ -407,7 +407,7 @@ sinal = comando[2]
 if func == 'codificador':
     inst_cod = Codifica(cod) # cria objeto/instancia de Codificação
     if tec == 'nrzi':
-        inst_cod.nrzi()
+        inst_cod.nrzi('nrzi')
     if tec == 'mdif':
         inst_cod.mdif()
     if tec == '8b6t':
