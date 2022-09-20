@@ -245,12 +245,21 @@ class Decodifica:
             binario = Decodifica.nrzi(sinal)
         if tec == 'mdif':
             binario = Decodifica.mdif(sinal)
+            if binario == 'ERRO':
+                print('ERRO')
+                return
         if tec == '8b6t':
             binario = Decodifica.eightBsixT(sinal)
+            if binario == 'ERRO':
+                print('ERRO')
+                return
         if tec == 'hdb3':
             binario = Decodifica.hdb3(sinal)
         if tec == '6b8b':
             binario = Decodifica.sixBeightB(sinal)
+            if binario == 'ERRO':
+                print('ERRO')
+                return
         if binario.startswith('0000'):
             hexa = '0' + str((hex(int(binario, 2))).split('x')[1])
         else:
@@ -283,7 +292,7 @@ class Decodifica:
     def mdif(self):
         global sinal
         if len(sinal) % 2 == 1:
-            print('ERRO')
+            return 'ERRO'
         result = ''
         size = len(sinal)
         i = 0
@@ -303,6 +312,10 @@ class Decodifica:
     
     def eightBsixT(self):
         global sinal
+
+        if len(sinal) % 6 != 0:
+            return 'ERRO'
+
         signals = []
         cont = 0
         space = ''
@@ -377,6 +390,10 @@ class Decodifica:
 
     def sixBeightB(self):
         global sinal
+        
+        if len(sinal) % 6 != 0:
+            return 'ERRO'
+
         binario = Decodifica.nrzi(sinal)
 
         binaries = []
