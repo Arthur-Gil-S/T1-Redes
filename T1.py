@@ -38,7 +38,7 @@ class Codifica:
                 num = ''
         return list
     
-    def countDisparity(binario):
+    def countDisparity(binario): #retorna a disparidade de um número binário
         disparity = 0
         for b in binario:
             if b == '0':
@@ -46,7 +46,7 @@ class Codifica:
             else: disparity += 1
         return disparity
 
-    def findCode(binario):
+    def findCode(binario): #quando a disparidade é +4 ou -4, essa função é chamada para achar o número binário de 8 bits resultante
         file = open("6b8b.txt","r")
 
         for line in file:
@@ -55,7 +55,7 @@ class Codifica:
                 return code[1]
         file.close()
 
-    def encode6b8b(self):
+    def encode6b8b(self): #codifica utilizando a técnica 6b8b
   
         listNum = Codifica.hexToBin6B8B(cod)
         result = ''
@@ -102,7 +102,7 @@ class Codifica:
     
         print(result)
 
-    def mdif(self):
+    def mdif(self): #codifica utilizando a técnica Manchester Diferencial
         binario = Codifica.hexToBin(cod)
         result = ''
         for bit in binario:
@@ -178,7 +178,7 @@ class Codifica:
         new_result = ''.join(result)
         print(new_result)
 
-    def countViolation(binario):
+    def countViolation(binario): #conta onde está as violações do número binário (4 0's consecutivos) e adiciona + ou -
         lastBit = '-'
         count = 0
         i = 0
@@ -196,7 +196,7 @@ class Codifica:
                 count = 0
         return result
 
-    def hdb3(self):
+    def hdb3(self): #codifica utilizando a técnica hdb3
         binario = Codifica.hexToBin(cod)
         violation = Codifica.countViolation(binario)
 
@@ -289,7 +289,7 @@ class Decodifica:
             index = index + 1
         return result
 
-    def mdif(self):
+    def mdif(self): #decodifica utilizando a tecnica Manchest Diferencial
         global sinal
         if len(sinal) % 2 == 1:
             return 'ERRO'
@@ -363,7 +363,7 @@ class Decodifica:
 
         return binario_result
 
-    def hdb3(self):
+    def hdb3(self): #decodifica utilizando a técnica HDB3
         result = ''
         i = 0
         for i in range(len(sinal)):
@@ -385,7 +385,6 @@ class Decodifica:
                 else:
                     result += '1'
                 
-        #print(result)
         return result
 
     def sixBeightB(self):
