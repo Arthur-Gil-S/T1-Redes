@@ -391,7 +391,7 @@ class Decodifica:
     def sixBeightB(self):
         global sinal
         
-        if len(sinal) % 6 != 0:
+        if len(sinal) % 8 != 0:
             return 'ERRO'
 
         binario = Decodifica.nrzi(sinal)
